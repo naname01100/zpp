@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>惹~~~❤</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        img {
+            position: absolute;
+            width: 100px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 3s ease-out, opacity 2s ease-in;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        let imageCount = 3; // 初始图片数量
+        const images = [];
+        const imgSrc1 = "zwl.jpg"; // 初始图片
+        const imgSrc2 = "zwl2.jpg"; // 触发放大+渐隐
+        const imgSrc3 = "zwl3.jpg"; // 触发短暂变化
+        let specialImageIndex = 0; // 确保至少 1 张可以触发 Koukou2
+
+        function createImage(x, y) {
+            let img = document.createElement("img");
+            img.src = imgSrc1;
+            img.style.left = x + "px";
+            img.style.top = y + "px";
+
+            let speedX = (Math.random() * 4 + 1) * (Math.random() > 0.5 ? 1 : -1);
+            let speedY = (Math.random() * 4 + 1) * (Math.random() > 0.5 ? 1 : -1);
+
+            images.push({ img, speedX, speedY });
+
+            let index = images.length - 1;
+
+            img.addEventListener("click", function () {
+                if (index === specialImageIndex) {
+                    // 触发 Koukou2，放大后渐隐
+                    img.src = imgSrc2;
+                    img.style.transform = "scale(3)";
+                    setTimeout(() => {
+                        img.style.opacity = "0";
+                        setTimeout(() => {
+                            img.remove();
+                            addNewImages(); // 触发后新增 2 张 Koukou
+                        }, 2000);
+                    }, 3000);
+                } else {
+                    // 其他变 Koukou3，2 秒后恢复 Koukou
+                    img.src = imgSrc3;
+                    setTimeout(() => {
+                        img.src = imgSrc1;
+                    }, 2000);
+                }
+            });
+
+            document.body.appendChild(img);
+        }
+
+        function addNewImages() {
+            for (let i = 0; i < 2; i++) {
+                let x = Math.random() * (window.innerWidth - 100);
+                let y = Math.random() * (window.innerHeight - 100);
+                createImage(x, y);
+            }
+            specialImageIndex = Math.floor(Math.random() * images.length); // 重新随机一个 Koukou2 触发点
+        }
+
+        function move() {
+            images.forEach(obj => {
+                let maxX = window.innerWidth - obj.img.clientWidth;
+                let maxY = window.innerHeight - obj.img.clientHeight;
+
+                let x = parseFloat(obj.img.style.left);
+                let y = parseFloat(obj.img.style.top);
+
+                x += obj.speedX;
+                y += obj.speedY;
+
+                if (x <= 0 || x >= maxX) obj.speedX *= -1;
+                if (y <= 0 || y >= maxY) obj.speedY *= -1;
+
+                obj.img.style.left = Math.max(0, Math.min(x, maxX)) + "px";
+                obj.img.style.top = Math.max(0, Math.min(y, maxY)) + "px";
+            });
+
+            requestAnimationFrame(move);
+        }
+
+        // 初始化 3 张图片
+        for (let i = 0; i < imageCount; i++) {
+            let x = Math.random() * (window.innerWidth - 100);
+            let y = Math.random() * (window.innerHeight - 100);
+            createImage(x, y);
+        }
+        specialImageIndex = Math.floor(Math.random() * images.length); // 初始设置随机 Koukou2
+
+        move();
+    </script>
+</body>
+</html>
